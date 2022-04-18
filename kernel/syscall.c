@@ -64,6 +64,7 @@ argint(int n, int *ip)
 // Retrieve an argument as a pointer.
 // Doesn't check for legality, since
 // copyin/copyout will do that.
+// systemcall 구현에서 위 두 함수의 반환값도 잘 살펴봐야함!
 int
 argaddr(int n, uint64 *ip)
 {
@@ -105,6 +106,7 @@ extern uint64 sys_wait(void);
 extern uint64 sys_write(void);
 extern uint64 sys_uptime(void);
 extern uint64 sys_trace(void);
+extern uint64 sys_sysinfo(void);
 
 // https://stackoverflow.com/questions/17581074/explicit-indexes-in-c-array-literals
 static uint64 (*syscalls[])(void) = {
@@ -130,6 +132,7 @@ static uint64 (*syscalls[])(void) = {
 [SYS_mkdir]   sys_mkdir,
 [SYS_close]   sys_close,
 [SYS_trace]   sys_trace,
+[SYS_sysinfo] sys_sysinfo,
 };
 
 static char* syscallNames[] = {
@@ -155,6 +158,7 @@ static char* syscallNames[] = {
 	"mkdir",
 	"close",
 	"trace",
+	"sysinfo",
 };
 
 void
