@@ -135,6 +135,16 @@ found:
     return 0;
   }
 
+  void *syscall = (void*)walkaddr(p->pagetable, USYSCALL);
+
+  if(syscall == 0) {
+    freeproc(p);
+    release(&p->lock);
+    return 0;
+  }
+  struct usyscall *usyscall = (struct usyscall*)syscall;
+  usyscall->pid = p->pid;
+
   // Set up new context to start executing at forkret,
   // which returns to user space.
   memset(&p->context, 0, sizeof(p->context));
@@ -196,6 +206,13 @@ proc_pagetable(struct proc *p)
     return 0;
   }
 
+  uint64 mem = (uint64)kalloc();
+  if(mem == 0 || mappages(pagetable, USYSCALL, PGSIZE, mem, PTE_R | PTE_U) < 0) {
+    uvmunmap(pagetable, USYSCALL, 1, 0);
+    uvmfree(pagetable, 0);
+    return 0;
+  }
+
   return pagetable;
 }
 
@@ -206,6 +223,7 @@ proc_freepagetable(pagetable_t pagetable, uint64 sz)
 {
   uvmunmap(pagetable, TRAMPOLINE, 1, 0);
   uvmunmap(pagetable, TRAPFRAME, 1, 0);
+  uvmunmap(pagetable, USYSCALL, 1, 1);
   uvmfree(pagetable, sz);
 }
 
