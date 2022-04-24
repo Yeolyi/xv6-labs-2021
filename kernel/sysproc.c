@@ -75,12 +75,39 @@ sys_sleep(void)
   return 0;
 }
 
-
 #ifdef LAB_PGTBL
-int
-sys_pgaccess(void)
+// int pgaccess(void *base, int len, void *mask);
+int sys_pgaccess(void)
 {
   // lab pgtbl: your code here.
+  uint64 ptr;
+  int len;
+  uint64 mask;
+
+  int temp = 0;
+
+  if(argaddr(0, &ptr) < 0)
+    return -1;
+  if(argint(1, &len) < 0)
+    return -1;
+  if (len > sizeof(unsigned int)*8) 
+    return -1;
+  if(argaddr(2, &mask) < 0)
+    return -1;
+
+  struct proc *p = myproc();
+
+  for(int i=0; i<len; i++) {
+    pte_t *pte = walk(p->pagetable, ptr+i*PGSIZE, 0);
+    if(pte < 0)
+      return -1;
+    if(*pte&PTE_A) {
+      temp |= (1<<i);
+      *pte &= ~(PTE_A); // panic: uvmunmap: not mapped ??? 느낌표 아니라 물결이다,,,
+    }
+  }
+
+  copyout(p->pagetable, mask, (char*)&temp, sizeof(temp));
   return 0;
 }
 #endif
