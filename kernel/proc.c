@@ -201,14 +201,23 @@ proc_pagetable(struct proc *p)
   // map the trapframe just below TRAMPOLINE, for trampoline.S.
   if(mappages(pagetable, TRAPFRAME, PGSIZE,
               (uint64)(p->trapframe), PTE_R | PTE_W) < 0){
-    uvmunmap(pagetable, TRAMPOLINE, 1, 0);
-    uvmfree(pagetable, 0);
+    uvmunmap(pagetable, TRAMPOLINE, 1, 0); // 아래랑 중복 아님?? 위에 있던 kalloc을 없애는 역할인듯. 
+    uvmfree(pagetable, 0); // 0이 전달되면 freewalk만 함. PTE를 0으로.
     return 0;
   }
 
   uint64 mem = (uint64)kalloc();
-  if(mem == 0 || mappages(pagetable, USYSCALL, PGSIZE, mem, PTE_R | PTE_U) < 0) {
-    uvmunmap(pagetable, USYSCALL, 1, 0);
+  if(mem == 0) {
+    uvmunmap(pagetable, TRAMPOLINE, 1, 0);
+    uvmunmap(pagetable, TRAPFRAME, 1, 0);
+    uvmfree(pagetable, 0);
+    return 0;
+  }
+
+  if(mappages(pagetable, USYSCALL, PGSIZE, mem, PTE_R | PTE_U) < 0) {
+    uvmunmap(pagetable, TRAMPOLINE, 1, 0);
+    uvmunmap(pagetable, TRAPFRAME, 1, 0);
+    kfree((void*)mem);
     uvmfree(pagetable, 0);
     return 0;
   }
