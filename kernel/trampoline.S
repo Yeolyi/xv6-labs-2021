@@ -38,6 +38,7 @@ uservec:
         sd t2, 88(a0)
         sd s0, 96(a0)
         sd s1, 104(a0)
+        // 112는 빠져있음(아래에서 저장하는 a0인듯. 현재 a0은 TRAPFRAME)
         sd a1, 120(a0)
         sd a2, 128(a0)
         sd a3, 136(a0)
