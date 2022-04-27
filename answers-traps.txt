@@ -1,0 +1,29 @@
+Which registers contain arguments to functions? For example, which register holds 13 in main's call to printf?
+- a2
+
+Where is the call to function f in the assembly code for main? Where is the call to g? (Hint: the compiler may inline functions.)
+- 26. 냅다 12로 넣어버린건가?
+
+At what address is the function printf located?
+- https://stackoverflow.com/questions/64695981/what-does-jalr-with-only-1-argument-and-offset-do?noredirect=1&lq=1
+- 628
+
+What value is in the register ra just after the jalr to printf in main?
+- 34?
+
+Run the following code.
+	unsigned int i = 0x00646c72;
+	printf("H%x Wo%s", 57616, &i);
+If the RISC-V were instead big-endian what would you set i to in order to yield the same output? 
+- HE110 World
+- 57616은 이진수로 1110-0001-0001-0000
+- printf에서 x는 print in lower-case hexadecimal.
+- 14-1-1-0이므로 e-1-1-0임. 
+- 문자열 프린트니까 포인터로 전달하는건데 주소를 계산하고 있었네,,,^^;
+- 00/64/6c/72, 리틀 엔디안이라서 1바이트씩 순서대로 읽는다면
+- 72 6c 64 00 순으로 읽음. r, l, d, NUL
+- 빅 엔디안이라면 0x726c6400
+
+In the following code, what is going to be printed after 'y='? (note: the answer is not a specific value.) Why does this happen?
+    printf("x=%d y=%d", 3);
+- 레지스터 a1에 있는 값이 int 형식으로 출력될 것. 

@@ -79,6 +79,8 @@ uservec:
         csrw satp, t1
         sfence.vma zero, zero
 
+        // epc는 여기서 말고 usertrap에서 저장하는데, 거기로 넘어가는데 필수적이지 않아서 그런가?
+
         # a0 is no longer valid, since the kernel page
         # table does not specially map p->tf.
 
@@ -94,6 +96,7 @@ userret:
         # a1: user page table, for satp.
 
         # switch to the user page table.
+        # 여기서부터는 레지스터와 TRAPFRAME만 접근 가능
         csrw satp, a1
         sfence.vma zero, zero
 
