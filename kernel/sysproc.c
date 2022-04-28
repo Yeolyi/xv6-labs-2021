@@ -97,7 +97,7 @@ sys_uptime(void)
   return xticks;
 }
 
-uint64 sys_sigalarm() {
+uint64 sys_sigalarm(void) {
   int tick;
   uint64 handler;
 
@@ -109,10 +109,26 @@ uint64 sys_sigalarm() {
   struct proc *p = myproc();
   p->alarminterval = tick;
   p->alarmhandler = (void(*)(void))handler;
-  printf("sigalarm: %d\n", tick);
   return 0;
 }
 
 uint64 sys_sigreturn(void) {
-return 0;
+  struct proc *p = myproc();
+  
+  p->trapframe->epc = p->alarmcontext[0];
+  p->trapframe->sp = p->alarmcontext[1];
+  p->trapframe->ra = p->alarmcontext[2];
+  p->trapframe->s0 = p->alarmcontext[3];
+  p->trapframe->s1 = p->alarmcontext[4];
+  p->trapframe->s2 = p->alarmcontext[5];
+  p->trapframe->s3 = p->alarmcontext[6];
+  p->trapframe->s4 = p->alarmcontext[7];
+  p->trapframe->a0 = p->alarmcontext[8];
+  p->trapframe->a1 = p->alarmcontext[9];
+  p->trapframe->a2 = p->alarmcontext[10];
+  p->trapframe->a3 = p->alarmcontext[11];
+  p->trapframe->a4 = p->alarmcontext[12];
+
+  p->alarmrunning = 0;
+  return 0;
 }

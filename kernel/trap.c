@@ -79,8 +79,23 @@ usertrap(void)
   // give up the CPU if this is a timer interrupt.
   if(which_dev == 2) {
     p->alarmtick += 1;
-    printf("%d\n", p->alarminterval);
-    if (p->alarminterval != 0 && (p->alarmtick % p->alarminterval == 0)) {
+
+    if (p->alarminterval != 0 && (p->alarmtick % p->alarminterval == 0) && p->alarmrunning == 0) {
+      p->alarmcontext[0] = p->trapframe->epc;
+      p->alarmcontext[1] = p->trapframe->sp;
+      p->alarmcontext[2] = p->trapframe->ra;
+      p->alarmcontext[3] = p->trapframe->s0;
+      p->alarmcontext[4] = p->trapframe->s1;
+      p->alarmcontext[5] = p->trapframe->s2;
+      p->alarmcontext[6] = p->trapframe->s3;
+      p->alarmcontext[7] = p->trapframe->s4;
+      p->alarmcontext[8] = p->trapframe->a0;
+      p->alarmcontext[9] = p->trapframe->a1;
+      p->alarmcontext[10] = p->trapframe->a2;
+      p->alarmcontext[11] = p->trapframe->a3;
+      p->alarmcontext[12] = p->trapframe->a4;
+
+      p->alarmrunning = 1;
       p->trapframe->epc = (uint64)p->alarmhandler;
     }
     yield();

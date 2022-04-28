@@ -109,4 +109,9 @@ struct proc {
   int alarminterval;
   void (*alarmhandler)(void);
   int alarmtick;
+  int alarmrunning;
+
+  // epc, sp, ra, s01234, a01234
+  // 왜 얘네인지도 알아보기,,
+  int alarmcontext[13];
 };
